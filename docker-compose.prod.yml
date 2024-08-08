@@ -1,0 +1,60 @@
+services:
+  # nats-server:
+  #   image: nats:latest
+
+  # client-gateway:
+  #   build:
+  #     context: ./client-gateway
+  #     dockerfile: Dockerfile.prod
+  #   image: client-gateway-prod
+  #   ports:
+  #     - ${CLIENT_GATEWAY_PORT}:${CLIENT_GATEWAY_PORT}
+  #   environment:
+  #     - PORT=${CLIENT_GATEWAY_PORT}
+  #     - NATS_SERVERS=nats://nats-server:4222
+
+  auth-ms:
+    build:
+      context: ./auth-ms
+      dockerfile: Dockerfile.prod
+    image: auth-ms-prod
+    ports:
+      - ${AUTH_MS_PORT}:${AUTH_MS_PORT}
+    environment:
+      - PORT=${AUTH_MS_PORT}
+      - NATS_SERVERS=nats://nats-server:4222
+      - DATABASE_URL=${AUTH_DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+
+  # orders-db:
+  #   image: postgres:16
+  #   container_name: orders-db
+  #   ports:
+  #     - 5432:5432
+  #   volumes:
+  #     - ./orders-ms/postgres:/var/lib/postgresql/data
+  #   environment:
+  #     PGDATA: /myData # para evitar el permiso denegado
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: orders
+
+  # products-ms:
+  #   build: ./products-ms
+  #   volumes:
+  #     - ./products-ms/src:/usr/src/app/src
+  #   command: npm run start:dev
+  #   environment:
+  #     - PORT=3000
+  #     - NATS_SERVERS=nats://nats-server:4222
+  #     - DATABASE_URL=file:./dev.db
+
+  # orders-ms:
+  #   build: ./orders-ms
+  #   volumes:
+  #     - ./orders-ms/src:/usr/src/app/src
+  #   command: npm run start:dev
+  #   environment:
+  #     - PORT=3000
+  #     - NATS_SERVERS=nats://nats-server:4222
+  #     - DATABASE_URL=postgresql://postgres:postgres@orders-db:5432/orders?schema=public
